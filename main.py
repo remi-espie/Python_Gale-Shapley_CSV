@@ -57,7 +57,7 @@ def main():
         # Rework participant: replace preference number with team name
         participants_strings = {}
         for participant, preferences in participants.items():
-            participants_strings[participant] = ['', '', '', '', '']
+            participants_strings[participant] = ['' for _ in range(len(team_sizes))]
             for rank, team in enumerate(preferences):
                 participants_strings[participant][int(team) - 1] = teams[rank]
 
