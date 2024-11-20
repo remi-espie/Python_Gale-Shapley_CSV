@@ -37,6 +37,32 @@ def gale_shapley(participants_func, teams_func, team_size_func):
     return matching
 
 
+def validate_csv_data(teams, team_sizes, participants):
+    # Check if the number of teams matches the number of team sizes
+    if len(teams) != len(team_sizes):
+        raise ValueError("The number of teams does not match the number of team sizes.")
+
+    # Check if each participant has the correct number of preferences
+    for participant, preferences in participants.items():
+        if len(preferences) != len(teams):
+            raise ValueError(f"Participant {participant} does not have the correct number of preferences.")
+
+    # Check if team sizes are positive integers
+    if any(size <= 0 for size in team_sizes):
+        raise ValueError("Team sizes must be positive integers.")
+
+    # Check if preferences are valid team indices
+    for participant, preferences in participants.items():
+        for preference in preferences:
+            if not preference.isdigit() or int(preference) < 1 or int(preference) > len(teams):
+                raise ValueError(f"Invalid preference {preference} for participant {participant}.")
+
+    # Check if each participant has unique preferences
+    for participant, preferences in participants.items():
+        if len(preferences) != len(set(preferences)):
+            raise ValueError(f"Participant {participant} has duplicate preferences.")
+
+
 def main():
     # Read preferences from the csv file
     with open('preferences.csv', newline='') as csvfile:
@@ -61,6 +87,10 @@ def main():
             for rank, team in enumerate(preferences):
                 participants_strings[participant][int(team) - 1] = teams[rank]
 
+    # Validate the CSV data
+    validate_csv_data(teams, team_sizes, participants)
+
+    # Perform the Gale-Shapley algorithm
     matching = gale_shapley(participants_strings, teams, team_sizes)
 
     # Print the matching nicely
